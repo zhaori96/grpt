@@ -17,9 +17,6 @@ func (r Row) GetSize() Size {
 }
 
 func (r *Row) Measure(boundries Size, renderer *DocumentRenderer) {
-	if len(r.Children) == 7 {
-		println("0")
-	}
 	if r.wasMeasuredAtLeastOnce {
 		r.Size = r.originalSize
 	} else {

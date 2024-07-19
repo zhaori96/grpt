@@ -98,12 +98,6 @@ func (c *Column) Render(renderer *DocumentRenderer) error {
 	position := renderer.GetCurrentOffset()
 	for index, child := range c.Children {
 		c.currentChildIndex = index
-		if len(c.Children) == 150 {
-			println("X")
-		}
-		if renderer.GetCurrentPage() == 2 && len(c.Children) == 150 {
-			println("Y")
-		}
 		if c.OverflowMode == OverflowModeContinueOnNextPage {
 			if !renderer.FitsIn(child.GetSize(), position, c.Size) {
 				renderer.AddPage()

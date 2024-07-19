@@ -266,9 +266,7 @@ func CalculateUnsizedElementSize(
 	totalSpace := availableSpace.GetAxis(axis) - totalAxisSize
 	size := totalSpace / float64(unsizedElements)
 	chesque := NewSizeFromAxis(size, availableSpace.GetAxis(axis.Cross()), axis)
-	if chesque.Width < 0 || chesque.Height < 0 {
-		println("fodeu aqui")
-	}
+
 	return chesque
 }
 
