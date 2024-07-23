@@ -244,15 +244,15 @@ func (r *DocumentRenderer) AddMultiFontFamilies(families ...FontFamily) error {
 	return nil
 }
 
-func (r *DocumentRenderer) SetFont(font Font) error {
-	return r.setFont(font, false)
-}
-
 func (r *DocumentRenderer) OnAddingPage(hooks ...func(*DocumentRenderer)) {
 	r.addingPageHooks = append(r.addingPageHooks, hooks...)
 }
 
-func (r *DocumentRenderer) setFont(font Font, keepCurrentState bool) error {
+func (r *DocumentRenderer) SetFont(font Font) (Font, error) {
+	return r.setFont(font, false)
+}
+
+func (r *DocumentRenderer) setFont(font Font, keepCurrentState bool) (Font, error) {
 	var family string = r.currentState.Font.Family
 	var style int = r.currentState.Font.Style.Combine()
 	var size float64 = r.currentState.Font.Size
@@ -272,38 +272,46 @@ func (r *DocumentRenderer) setFont(font Font, keepCurrentState bool) error {
 	err := r.engine.SetFontWithStyle(family, style, size)
 
 	if err != nil {
-		return nil
+		return r.currentState.Font, nil
 	}
 
+	lastFont := r.currentState.Font
 	if !keepCurrentState {
 		r.currentState.Font = font
 	}
 
-	return nil
+	return lastFont, nil
 }
 
-func (r *DocumentRenderer) SetFontFamily(family string) error {
+func (r *DocumentRenderer) SetFontFamily(family string) (string, error) {
 	return r.setFontFamily(family, false)
 }
 
-func (r *DocumentRenderer) setFontFamily(family string, keepCurrentState bool) error {
-	err := r.SetFont(Font{Family: family})
+func (r *DocumentRenderer) setFontFamily(
+	family string,
+	keepCurrentState bool,
+) (string, error) {
+	_, err := r.SetFont(Font{Family: family})
 	if err != nil {
-		return err
+		return r.currentState.Font.Family, err
 	}
 
+	lastFamily := r.currentState.Font.Family
 	if !keepCurrentState {
 		r.currentState.Font.Family = family
 	}
 
-	return nil
+	return lastFamily, nil
 }
 
-func (r *DocumentRenderer) SetFontStyle(style FontStyle) error {
+func (r *DocumentRenderer) SetFontStyle(style FontStyle) (*FontStyle, error) {
 	return r.setFontStyle(style, false)
 }
 
-func (r *DocumentRenderer) setFontStyle(style FontStyle, keepCurrentState bool) error {
+func (r *DocumentRenderer) setFontStyle(
+	style FontStyle,
+	keepCurrentState bool,
+) (*FontStyle, error) {
 	err := r.engine.SetFontWithStyle(
 		r.currentState.Font.Family,
 		style.Combine(),
@@ -311,68 +319,90 @@ func (r *DocumentRenderer) setFontStyle(style FontStyle, keepCurrentState bool) 
 	)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	lastStyle := r.currentState.Font.Style
 	if !keepCurrentState {
 		r.currentState.Font.Style = &style
 	}
 
-	return nil
+	return lastStyle, nil
 }
 
-func (r *DocumentRenderer) SetFontSize(size float64) error {
+func (r *DocumentRenderer) SetFontSize(size float64) (float64, error) {
 	return r.setFontSize(size, false)
 }
 
-func (r *DocumentRenderer) setFontSize(size float64, keepCurrentState bool) error {
+func (r *DocumentRenderer) setFontSize(
+	size float64,
+	keepCurrentState bool,
+) (float64, error) {
 	err := r.engine.SetFontSize(size)
 	if err != nil {
-		return err
+		return r.currentState.Font.Size, err
 	}
 
+	lastSize := r.currentState.Font.Size
 	if !keepCurrentState {
 		r.currentState.Font.Size = size
 	}
 
-	return nil
+	return lastSize, nil
 }
 
-func (r *DocumentRenderer) SetStrokeWidth(width float64) {
-	r.setStrokeWidth(width, false)
+func (r *DocumentRenderer) SetStrokeWidth(width float64) float64 {
+	return r.setStrokeWidth(width, false)
 }
 
-func (r *DocumentRenderer) setStrokeWidth(width float64, keepCurrentState bool) {
+func (r *DocumentRenderer) setStrokeWidth(
+	width float64,
+	keepCurrentState bool,
+) float64 {
 	r.engine.SetLineWidth(width)
 
+	lastWidth := r.currentState.StrokeWidth
 	if !keepCurrentState {
 		r.currentState.StrokeWidth = width
 	}
+
+	return lastWidth
 }
 
-func (r *DocumentRenderer) SetStrokeColor(color Color) {
-	r.setStrokeColor(color, false)
-
+func (r *DocumentRenderer) SetStrokeColor(color Color) Color {
+	return r.setStrokeColor(color, false)
 }
 
-func (r *DocumentRenderer) setStrokeColor(color Color, keepCurrentState bool) {
+func (r *DocumentRenderer) setStrokeColor(
+	color Color,
+	keepCurrentState bool,
+) Color {
 	r.engine.SetStrokeColor(color.R, color.G, color.B)
 
+	lastColor := r.currentState.StrokeColor
 	if !keepCurrentState {
 		r.currentState.StrokeColor = color
 	}
+
+	return lastColor
 }
 
-func (r *DocumentRenderer) SetLineStyle(style LineStyle) {
-	r.setLineStyle(style, false)
+func (r *DocumentRenderer) SetLineStyle(style LineStyle) LineStyle {
+	return r.setLineStyle(style, false)
 }
 
-func (r *DocumentRenderer) setLineStyle(style LineStyle, keepCurrentState bool) {
+func (r *DocumentRenderer) setLineStyle(
+	style LineStyle,
+	keepCurrentState bool,
+) LineStyle {
 	r.engine.SetLineType(string(style))
 
+	lastStyle := r.currentState.LineStyle
 	if !keepCurrentState {
 		r.currentState.LineStyle = style
 	}
+
+	return lastStyle
 }
 
 func (r *DocumentRenderer) GetTextHeight(text string) float64 {
