@@ -1,16 +1,22 @@
 package grpt
 
 import (
+	"embed"
+	"io/fs"
 	"os"
 	"strings"
 
 	"github.com/signintech/gopdf"
 )
 
+//go:embed assets/fonts
+var fonts embed.FS
+
 var (
 	standardFontFamilies = []FontFamily{
 		{
 			Name:       "roboto",
+			Source:     fonts,
 			Path:       "assets/fonts/roboto",
 			Regular:    "Roboto-Regular.ttf",
 			Italic:     "Roboto-Italic.ttf",
@@ -19,6 +25,7 @@ var (
 		},
 		{
 			Name:       "calibri",
+			Source:     fonts,
 			Path:       "assets/fonts/calibri",
 			Regular:    "Calibri-Regular.ttf",
 			Italic:     "Calibri-Italic.ttf",
@@ -39,6 +46,7 @@ func StandardFontFamilies() []FontFamily {
 
 type FontFamily struct {
 	Name       string
+	Source     fs.FS
 	Path       string
 	Regular    string
 	Italic     string
