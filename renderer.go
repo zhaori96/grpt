@@ -172,40 +172,59 @@ func (r *DocumentRenderer) AddToAxis(value float64, axis Axis) {
 	}
 }
 
-func (r *DocumentRenderer) AddFontFamily(family FontFamily) error {
-	var err error
+func (r *DocumentRenderer) addFont(family FontFamily, style int) error {
+	var fileName string
+	switch style {
+	case gopdf.Regular:
+		fileName = family.Regular
+	case gopdf.Italic:
+		fileName = family.Italic
+	case gopdf.Bold:
+		fileName = family.Bold
+	case gopdf.Bold | gopdf.Italic:
+		fileName = family.BoldItalic
+	default:
+		panic("invalid font style")
+	}
 
+	ttfOption := gopdf.TtfOption{Style: style}
+	filePath := path.Join(family.Path, fileName)
+
+	var err error
+	if family.Source != nil {
+		file, _ := family.Source.Open(filePath)
+		err = r.engine.AddTTFFontByReaderWithOption(family.Name, file, ttfOption)
+	} else {
+		err = r.engine.AddTTFFontWithOption(family.Name, filePath, ttfOption)
+	}
+
+	return err
+}
+
+func (r *DocumentRenderer) AddFontFamily(family FontFamily) error {
 	if family.HasRegularStyle() {
-		filePath := path.Join(family.Path, family.Regular)
-		style := gopdf.TtfOption{Style: gopdf.Regular}
-		err = r.engine.AddTTFFontWithOption(family.Name, filePath, style)
+		err := r.addFont(family, gopdf.Regular)
 		if err != nil {
 			return err
 		}
 	}
 
 	if family.HasItalicStyle() {
-		filePath := path.Join(family.Path, family.Italic)
-		style := gopdf.TtfOption{Style: gopdf.Italic}
-		err = r.engine.AddTTFFontWithOption(family.Name, filePath, style)
+		err := r.addFont(family, gopdf.Italic)
 		if err != nil {
 			return err
 		}
 	}
 
 	if family.HasBoldStyle() {
-		filePath := path.Join(family.Path, family.Bold)
-		style := gopdf.TtfOption{Style: gopdf.Bold}
-		err = r.engine.AddTTFFontWithOption(family.Name, filePath, style)
+		err := r.addFont(family, gopdf.Bold)
 		if err != nil {
 			return err
 		}
 	}
 
 	if family.HasBoldItalicStyle() {
-		filePath := path.Join(family.Path, family.BoldItalic)
-		style := gopdf.TtfOption{Style: gopdf.Bold | gopdf.Italic}
-		err = r.engine.AddTTFFontWithOption(family.Name, filePath, style)
+		err := r.addFont(family, gopdf.Bold|gopdf.Italic)
 		if err != nil {
 			return err
 		}
