@@ -1,10 +1,14 @@
 package grpt
 
 import (
+	"bytes"
 	ctx "context"
 	"errors"
 	"fmt"
 	"image"
+	"image/jpeg"
+	"image/png"
+	"io"
 	"math"
 	"path"
 	"slices"
@@ -878,8 +882,59 @@ func (r *DocumentRenderer) DrawBoxWithBorders(
 	return nil
 }
 
-func (r *DocumentRenderer) DrawImage(path image.Image, size Size) error {
+func (r *DocumentRenderer) DrawImage(
+	source any,
+	size Size,
+	options ImageOptions,
+) error {
 	offset := r.GetCurrentOffset()
+	parsedOptions := options.toGopdf()
+	parsedOptions.X = offset.X
+	parsedOptions.Y = offset.Y
+	parsedOptions.Rect = size.ToRect()
 
-	return r.engine.ImageFrom(path, offset.X, offset.Y, size.ToRect())
+	img, err := sourceToImageHolder(source, options.Format)
+	if err != nil {
+		return err
+	}
+
+	return r.engine.ImageByHolderWithOptions(img, parsedOptions)
+}
+
+func sourceToImageHolder(
+	source any,
+	format ImageFormat,
+) (gopdf.ImageHolder, error) {
+	var img gopdf.ImageHolder
+	var err error
+	switch s := source.(type) {
+	case string:
+		img, err = gopdf.ImageHolderByPath(s)
+	case []byte:
+		img, err = gopdf.ImageHolderByBytes(s)
+	case io.Reader:
+		img, err = gopdf.ImageHolderByReader(s)
+	case image.Image:
+		buffer := &bytes.Buffer{}
+		switch format {
+		case ImageFormatPNG:
+			err = png.Encode(buffer, s)
+		case ImageFormatJPEG, ImageFormatDefault:
+			err = jpeg.Encode(buffer, s, nil)
+		default:
+			panic(fmt.Errorf("invalid image format: %s", format))
+		}
+		if err != nil {
+			return nil, err
+		}
+		img, err = gopdf.ImageHolderByReader(buffer)
+	default:
+		return nil, errors.New("invalid image")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
 }
