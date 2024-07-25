@@ -539,7 +539,9 @@ func (r *DocumentRenderer) SetFooter(
 
 		if currentAttempt == 1 {
 			r.SetY(pageSize.Height - height + renderer.options.Padding.Top)
-			footer.Render(renderer)
+			if err := footer.Render(renderer); err != nil {
+				panic(err)
+			}
 			renderer.addingFooterAttemps = 0
 		}
 	}
