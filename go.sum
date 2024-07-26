@@ -7,5 +7,3 @@ github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/signintech/gopdf v0.26.1 h1:U9Mzqnzp+tgx/mUNWUwiBzAica+St+CsJ4wTn8lrmxY=
 github.com/signintech/gopdf v0.26.1/go.mod h1:d23eO35GpEliSrF22eJ4bsM3wVeQJTjXTHq5x5qGKjA=
-gopkg.in/gographics/imagick.v2 v2.7.0 h1:Acluvnk5MhtETFX4EVnt9NbjC32ROaaC3bx6nJueHJk=
-gopkg.in/gographics/imagick.v2 v2.7.0/go.mod h1:/QVPLV/iKdNttRKthmDkeeGg+vdHurVEPc8zkU0XgBk=

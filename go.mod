@@ -5,7 +5,6 @@ go 1.22.5
 require (
 	github.com/boombuler/barcode v1.0.2
 	github.com/signintech/gopdf v0.26.1
-	gopkg.in/gographics/imagick.v2 v2.7.0
 )
 
 require (
