@@ -119,9 +119,10 @@ func (t *Text) parseValue() string {
 
 	var text string
 	switch raw := t.Value.(type) {
-	case interface{ Value() (driver.Value, error) }:
-		value, _ := raw.Value()
-		text = fmt.Sprint(value)
+	case driver.Valuer:
+		if value, _ := raw.Value(); value != nil {
+			text = fmt.Sprint(value)
+		}
 	default:
 		text = fmt.Sprint(raw)
 	}
