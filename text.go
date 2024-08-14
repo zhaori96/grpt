@@ -113,6 +113,10 @@ func (t *Text) parseValue() string {
 		}
 	}
 
+	if t.Value == nil {
+		return ""
+	}
+
 	var text string
 	switch raw := t.Value.(type) {
 	case interface{ Value() (driver.Value, error) }:
