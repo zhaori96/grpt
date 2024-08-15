@@ -84,53 +84,53 @@ func (n *NumericFormatter) Format(text any) string {
 
 func (n NumericFormatter) With(
 	options ...NumericFormatterOption,
-) NumericFormatter {
+) *NumericFormatter {
 	for _, option := range options {
 		if option == nil {
 			continue
 		}
 		option(&n)
 	}
-	return n
+	return &n
 }
 
-func (n NumericFormatter) WithPrefix(prefix string) NumericFormatter {
+func (n NumericFormatter) WithPrefix(prefix string) *NumericFormatter {
 	n.Prefix = prefix
-	return n
+	return &n
 }
 
-func (n NumericFormatter) WithSuffix(suffix string) NumericFormatter {
+func (n NumericFormatter) WithSuffix(suffix string) *NumericFormatter {
 	n.Suffix = suffix
-	return n
+	return &n
 }
 
 func (n NumericFormatter) WithDecimalSeparator(
 	separator string,
-) NumericFormatter {
+) *NumericFormatter {
 	n.DecimalSeparator = separator
-	return n
+	return &n
 }
 
 func (n NumericFormatter) WithThousandSeparator(
 	separator string,
-) NumericFormatter {
+) *NumericFormatter {
 	n.ThousandSeparator = separator
-	return n
+	return &n
 }
 
-func (n NumericFormatter) WithPrecision(precision int) NumericFormatter {
+func (n NumericFormatter) WithPrecision(precision int) *NumericFormatter {
 	n.Precision = precision
-	return n
+	return &n
 }
 
-func (n NumericFormatter) WithNegativeFormat(format string) NumericFormatter {
+func (n NumericFormatter) WithNegativeFormat(format string) *NumericFormatter {
 	n.NegativeFormat = format
-	return n
+	return &n
 }
 
-func (n NumericFormatter) WithHideSign(hide bool) NumericFormatter {
+func (n NumericFormatter) WithHideSign(hide bool) *NumericFormatter {
 	n.HideSign = hide
-	return n
+	return &n
 }
 
 func (n *NumericFormatter) parseText(text any) (float64, error) {
