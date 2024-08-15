@@ -211,19 +211,27 @@ func (d *DateTimeFormatter) Format(text any) string {
 		return "N/D"
 	}
 
+	if dateTime.IsZero() {
+		return ""
+	}
+
 	return dateTime.Format(d.Pattern)
 }
 
 func (d *DateTimeFormatter) parseText(text any) (time.Time, error) {
-	if value, ok := text.(time.Time); ok {
-		return value, nil
-	}
-
 	var raw any
 	if valuer, ok := text.(driver.Valuer); ok {
 		raw, _ = valuer.Value()
 	} else {
 		raw = text
+	}
+
+	if raw == nil {
+		return time.Time{}, nil
+	}
+
+	if value, ok := raw.(time.Time); ok {
+		return value, nil
 	}
 
 	formats := d.SourcePatterns
