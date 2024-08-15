@@ -5,13 +5,6 @@ import (
 	"fmt"
 )
 
-type TextFormatter interface {
-	Format(text any) string
-}
-
-type FormattedText interface {
-	Formatted() string
-}
 
 type TextStyle struct {
 	Font      *Font
