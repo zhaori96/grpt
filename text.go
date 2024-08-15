@@ -49,6 +49,7 @@ func (t TextStyle) Merge(other TextStyle) TextStyle {
 type Text struct {
 	Value          any
 	Formatter      TextFormatter
+	FormatterFunc  Formatter
 	SkipFormatting bool
 	Size           Size
 	Style          TextStyle
@@ -100,6 +101,9 @@ func (t *Text) parseValue() string {
 	if !t.SkipFormatting {
 		if t.Formatter != nil {
 			return t.Formatter.Format(t.Value)
+		}
+		if t.FormatterFunc != nil {
+			return t.FormatterFunc(t.Value)
 		}
 		if value, ok := t.Value.(FormattedText); ok {
 			return value.Formatted()
