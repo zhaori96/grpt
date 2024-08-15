@@ -38,11 +38,11 @@ const (
 	PEN Currency = "PEN"
 )
 
-func CurrencyFormatter(currency Currency) NumericFormatter {
+func CurrencyFormatter(currency Currency) *NumericFormatter {
 	if formatter, ok := currencyFormatters[currency]; ok {
-		return formatter
+		return &formatter
 	}
-	return NumericFormatter{Precision: 2}
+	return &NumericFormatter{Precision: 2}
 }
 
 var currencyFormatters = map[Currency]NumericFormatter{
