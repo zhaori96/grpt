@@ -23,6 +23,44 @@ type FormattedText interface {
 
 const NegativeParenthesesFormat = "(#)"
 
+var registeredFormatters = map[TextType]TextFormatter{
+	TextTypeDate: &DateTimeFormatter{
+		Pattern: time.DateOnly,
+	},
+	TextTypeTime: &DateTimeFormatter{
+		Pattern: time.TimeOnly,
+	},
+	TextTypeDateTime: &DateTimeFormatter{
+		Pattern: time.DateTime,
+	},
+	TextTypeReal: &NumericFormatter{
+		Precision: 2,
+	},
+	TextTypePercentage: &NumericFormatter{
+		Suffix:    "%",
+		Precision: 2,
+	},
+}
+
+func RegisterFormatter(formatter TextFormatter, types ...TextType) bool {
+	if formatter == nil {
+		return false
+	}
+
+	for _, textType := range types {
+		registeredFormatters[textType] = formatter
+	}
+
+	return true
+}
+
+func RegisteredFormatter(textType TextType) TextFormatter {
+	if formatter, ok := registeredFormatters[textType]; ok {
+		return formatter
+	}
+	return nil
+}
+
 type NumericFormatter struct {
 	Prefix                  string
 	Suffix                  string
@@ -30,6 +68,7 @@ type NumericFormatter struct {
 	ThousandSeparator       string
 	WithoutDecimalSeparator bool
 	Precision               int
+	Transform               func(float64) float64
 	NegativeFormat          string
 	HideSign                bool
 }
@@ -55,6 +94,10 @@ func (n *NumericFormatter) Format(text any) string {
 	number, err := n.parseText(text)
 	if err != nil {
 		return "NaN"
+	}
+
+	if n.Transform != nil {
+		number = n.Transform(number)
 	}
 
 	isNegative := number < 0
@@ -130,6 +173,13 @@ func (n NumericFormatter) WithNegativeFormat(format string) *NumericFormatter {
 
 func (n NumericFormatter) WithHideSign(hide bool) *NumericFormatter {
 	n.HideSign = hide
+	return &n
+}
+
+func (n NumericFormatter) WithTransform(
+	transform func(float64) float64,
+) *NumericFormatter {
+	n.Transform = transform
 	return &n
 }
 

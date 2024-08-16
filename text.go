@@ -5,6 +5,18 @@ import (
 	"fmt"
 )
 
+type TextType int
+
+const (
+	TextTypeDefault TextType = iota
+	TextTypeMonetary
+	TextTypeDate
+	TextTypeTime
+	TextTypeDateTime
+	TextTypeInteger
+	TextTypeReal
+	TextTypePercentage
+)
 
 type TextStyle struct {
 	Font      *Font
@@ -47,6 +59,7 @@ func (t TextStyle) Merge(other TextStyle) TextStyle {
 }
 
 type Text struct {
+	Type           TextType
 	Value          any
 	Formatter      TextFormatter
 	FormatterFunc  Formatter
@@ -107,6 +120,9 @@ func (t *Text) parseValue() string {
 		}
 		if value, ok := t.Value.(FormattedText); ok {
 			return value.Formatted()
+		}
+		if formatter := RegisteredFormatter(t.Type); formatter != nil {
+			return formatter.Format(t.Value)
 		}
 	}
 
