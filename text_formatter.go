@@ -91,9 +91,13 @@ func (n *NumericFormatter) Format(text any) string {
 		return ""
 	}
 
-	number, err := n.parseText(text)
+	number, err, ok := n.parseText(text)
 	if err != nil {
 		return "NaN"
+	}
+
+	if !ok {
+		return ""
 	}
 
 	if n.Transform != nil {
@@ -183,12 +187,12 @@ func (n NumericFormatter) WithTransform(
 	return &n
 }
 
-func (n *NumericFormatter) parseText(text any) (float64, error) {
+func (n *NumericFormatter) parseText(text any) (float64, error, bool) {
 	switch v := text.(type) {
 	case float64:
-		return v, nil
+		return v, nil, true
 	case int:
-		return float64(v), nil
+		return float64(v), nil, true
 	}
 
 	var raw any
@@ -198,10 +202,14 @@ func (n *NumericFormatter) parseText(text any) (float64, error) {
 		raw = text
 	}
 
+	if raw == nil {
+		return 0, nil, false
+	}
+
 	if value, err := strconv.ParseFloat(fmt.Sprint(raw), 64); err == nil {
-		return value, nil
+		return value, nil, true
 	} else {
-		return 0, errors.New("invalid number")
+		return 0, errors.New("invalid number"), false
 	}
 }
 
