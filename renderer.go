@@ -90,6 +90,23 @@ func (r *DocumentRenderer) WritePDF(path string) error {
 	return r.engine.WritePdf(path)
 }
 
+func (r *DocumentRenderer) WriteTo(writer io.Writer) (int64, error) {
+	if r.footerCallback != nil {
+		r.footerCallback(r)
+	}
+	return r.engine.WriteTo(writer)
+}
+
+func (r *DocumentRenderer) Write() ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	_, err := r.WriteTo(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
+}
+
 func (r *DocumentRenderer) GetCurrentOffset() Offset {
 	return Offset{X: r.engine.GetX(), Y: r.engine.GetY()}
 }
