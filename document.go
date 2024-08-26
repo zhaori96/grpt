@@ -1,5 +1,7 @@
 package grpt
 
+import "io"
+
 type DocumentHeader struct {
 	ShouldRepeat bool
 	Height       float64
@@ -24,7 +26,34 @@ type Document struct {
 	Footer   DocumentFooter
 }
 
-func (d *Document) Build(path string) error {
+func (d *Document) Write() ([]byte, error) {
+	renderer, err := d.build()
+	if err != nil {
+		return nil, err
+	}
+
+	return renderer.Write()
+}
+
+func (d *Document) WriteTo(writer io.Writer) (int64, error) {
+	renderer, err := d.build()
+	if err != nil {
+		return 0, err
+	}
+
+	return renderer.WriteTo(writer)
+}
+
+func (d *Document) WritePDF(path string) (error) {
+	renderer, err := d.build()
+	if err != nil {
+		return err
+	}
+
+	return renderer.WritePDF(path)
+}
+
+func (d *Document) build() (*DocumentRenderer, error) {
 	renderer := StartNewDocument(RendererOptions{
 		PageSize: d.PageSize,
 		Padding:  d.Padding,
@@ -78,8 +107,8 @@ func (d *Document) Build(path string) error {
 
 	body.Measure(initialBodySize, renderer)
 	if err := body.Render(renderer); err != nil {
-		return err
+		return nil, err
 	}
 
-	return renderer.WritePDF(path)
+	return renderer, nil
 }
