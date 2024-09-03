@@ -106,6 +106,7 @@ func (d *Document) build() (*DocumentRenderer, error) {
 	})
 
 	body.Measure(initialBodySize, renderer)
+	renderer.SetCurrentBodyHeight(body.GetSize().Height)
 	if err := body.Render(renderer); err != nil {
 		return nil, err
 	}
