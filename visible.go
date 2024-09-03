@@ -8,7 +8,7 @@ type Visible struct {
 	size Size
 }
 
-func (v Visible) GetSize() Size {
+func (v *Visible) GetSize() Size {
 	return v.size
 }
 
